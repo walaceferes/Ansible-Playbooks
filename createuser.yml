@@ -1,0 +1,29 @@
+- hosts:
+  become: 
+  tasks:
+    - name: Criar user
+      user:
+        name: [username]
+        shell: /bin/bash
+        password: "[hash da senha]"
+    - name: Selecionar linha e armazenar a mesma na variável alowedusers
+      shell: "cat /etc/ssh/sshd_config | grep '^AllowUsers' "
+      register: allowedusers
+      changed_when: false
+    - name: Debug users atuais
+      debug:
+        msg: "Usuários liberados atualmente {{ allowedusers.stdout }}"
+    - name: Inserir user criado para permissão de acesso via ssh
+      lineinfile: dest=/etc/ssh/sshd_config regexp='^AllowUsers' line='{{ allowedusers.stdout }} [username]'
+      when: '"[username]" not in allowedusers.stdout'
+    - name: Selecionar linha e armazenar a mesma na variável newusers
+      shell: "cat /etc/ssh/sshd_config | grep '^AllowUsers'"
+      register: newusers
+      changed_when: false
+    - name: Debug novos users
+      debug:
+        msg: "Usuários liberados após a atualização {{ newusers.stdout }}"
+    - name: Restartar serviço sshd
+      service:
+        name: sshd
+        state: restarted
