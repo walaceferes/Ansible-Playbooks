@@ -1,0 +1,10 @@
+- name: Dar permissão ao user para alterar senhas
+      lineinfile:
+        dest: /etc/sudoers
+        line: '[user] ALL=(ALL) NOPASSWD:/usr/bin/passwd'
+        validate: 'visudo -cf %s'
+    - name: Dar permissão para user no sudo
+      lineinfile:
+        dest: /etc/sudoers
+        line: '[user] ALL=(ALL) NOPASSWD:ALL'
+        validate: 'visudo -cf %s'
