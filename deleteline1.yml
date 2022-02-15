@@ -2,14 +2,13 @@
   become: true  
   tasks:
     - name:  
-      lineinfile:
-        dest: /etc/sudoers
-        regexp: 'svcacc_cofre ALL=(ALL) NOPASSWD:/usr/bin/passwd'+
+      lineinfile: Excluir linha1
+        dest: [caminho do arquivo]
+        regexp: '[Linha que deseja excluir]'
         state: absent
-        validate: 'visudo -c'
-    - name: Dar permissão para user no sudo
+    - name: Excluir linha2
       lineinfile:
-        dest: /etc/sudoers
-        regex: 'npadmin ALL=(ALL) NOPASSWD:ALL'
+        dest: [caminho do arquivo]
+        regex: '[Linha que deseja excluir]'
         state: absent
-        validate: 'visudo -c %s'
+        
