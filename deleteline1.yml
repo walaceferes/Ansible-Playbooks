@@ -1,0 +1,15 @@
+- hosts: piloto
+  become: true  
+  tasks:
+    - name:  
+      lineinfile:
+        dest: /etc/sudoers
+        regexp: 'svcacc_cofre ALL=(ALL) NOPASSWD:/usr/bin/passwd'+
+        state: absent
+        validate: 'visudo -c'
+    - name: Dar permissão para user no sudo
+      lineinfile:
+        dest: /etc/sudoers
+        regex: 'npadmin ALL=(ALL) NOPASSWD:ALL'
+        state: absent
+        validate: 'visudo -c %s'
