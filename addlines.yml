@@ -1,0 +1,11 @@
+- hosts: 
+  become: true  
+  tasks:
+    - name: Alterar última linha do arquivo
+      lineinfile:
+        dest: [caminho do arquivo completo]
+        line: '[Conteudo da linha]'
+    - name: Alterar última linha do arquivo
+      lineinfile:
+        dest: [caminho do arquivo completo]
+        line: '[Conteudo da linha]'
