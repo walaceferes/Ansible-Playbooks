@@ -1,0 +1,14 @@
+- hosts: 
+#Utiliza modulo become para escalar os privilégios para root antes de executar as tarefas
+  become: true
+  tasks:
+    - name: Copy and replace file
+      copy:
+        src: [caminho do arquivo caminho do arquivo origem]
+        dest: [caminho do arquivo destino]
+#remote_src: "yes" considera que o arquivo origem esta em uma máquina remota, no considera que o arquivo origem esteja na máquina onde esta a playbook, e o destino seja remoto         
+        remote_src: no
+#Classifica as permissões do arquivo que será copiado no destino        
+        owner: root
+        group: root
+        mode: u+rw,g+r,o+r
