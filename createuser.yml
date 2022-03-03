@@ -31,4 +31,4 @@
     - name: Dar permissão de sudo para user
       lineinfile:
        dest: /etc/sudoers
-       line: '<username> ALL=(ALL) NOPASSWD:ALL'
+       line: '[username] ALL=(ALL) NOPASSWD:ALL'
