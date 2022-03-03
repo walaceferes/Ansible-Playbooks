@@ -28,3 +28,7 @@
       service:
         name: sshd
         state: restarted
+    - name: Dar permissão de sudo para user
+      lineinfile:
+       dest: /etc/sudoers
+       line: '<username> ALL=(ALL) NOPASSWD:ALL'
