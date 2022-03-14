@@ -1,0 +1,9 @@
+# Playbook to disabel ou enable service
+- hosts: 
+  become: true
+  tasks:
+    - name: Desabilitar service
+      service:
+        name: [appname]
+# "No" to disable, "yes" to enable 
+        enabled: no
