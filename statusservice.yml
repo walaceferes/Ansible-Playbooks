@@ -1,4 +1,4 @@
-# Playbook to disabel ou enable service
+# Playbook to disable or enable service
 - hosts: 
   become: true
   tasks:
