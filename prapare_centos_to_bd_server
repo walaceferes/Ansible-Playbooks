@@ -1,0 +1,119 @@
+- hosts: 
+  become: true
+  tasks:
+#Change Machine Hotsname
+    - name: Alterar hostname
+      hostname:
+         name: 
+         use: systemd
+#Change IP Adreess, Gateway and restart network interface
+    - name: Alterar IP
+      lineinfile:
+          dest: /etc/sysconfig/network-scripts/ifcfg-ens192
+          regex: '^IPADDR'
+          line: IPADDR=10.50.35.3
+    - name: Alterar GTW
+      lineinfile:
+          dest: /etc/sysconfig/network-scripts/ifcfg-ens192
+          regex: '^GATEWAY'
+          line: GATEWAY=10.50.35.1
+    - name: Restart Network
+      service:
+        name: NetworkManager
+        state: restarted
+#if you already played the playbook once, you should comment this whole part
+    - name: 1 Preparar /data
+      shell: "pvcreate /dev/sdb" 
+    - name: 2 Preparar /data  
+      shell: "vgcreate vg1 /dev/sdb"
+    - name: 3 Preparar /data  
+      shell: "lvcreate -l+100%FREE -n data vg1"
+    - name: 1 Preparar /backup
+      shell: "pvcreate /dev/sdc" 
+    - name: 2 Preparar /backup
+      shell: "vgcreate vg2 /dev/sdc"
+    - name: 3 Preparar /backup  
+      shell: "lvcreate -l+100%FREE -n backup vg2"
+# Create users
+    - name: Criar user 1
+      user:
+        name: 
+        shell: /bin/bash
+        password: 
+    - name:  Criar user 2
+      user:
+        name: 
+        shell: /bin/bash
+        password: 
+    - name: Criar user 3  
+      user:
+        name: 
+        shell: /bin/bash
+        password: 
+# Allow users access in ssh and restart sshd service
+    - name: Get actual allowusers
+      shell: "cat /etc/ssh/sshd_config | grep '^AllowUsers'"
+      register: allowedusers
+      changed_when: false
+    - name: Debug actual users
+      debug:
+        msg: "Usuários liberados atualmente {{ allowedusers.stdout }}"
+    - name: Allow user in sshd
+      lineinfile: dest=/etc/ssh/sshd_config regexp='^AllowUsers' line='{{ allowedusers.stdout }} usernames'
+      when: '"usernames" not in allowedusers.stdout'
+    - name: Get new allowusers
+      shell: "cat /etc/ssh/sshd_config | grep '^AllowUsers'"
+      register: newusers
+      changed_when: false
+    - name: Debug new users
+      debug:
+        msg: "Usuários liberados após a atualização {{ newusers.stdout }}"
+    - name: Restartar serviço sshd
+      service:
+        name: sshd
+        state: restarted
+# Move users home to /opt
+    - name: Mover home user1
+      shell: mv /home/username /opt/
+    - name: Mover home home user2
+      shell: mv /home/username /opt/
+    - name: Mover home user3
+      shell: mv /home/username /opt/
+    - name: Alterar apontamento home user1
+      lineinfile:
+          dest: /etc/passwd
+          regex: '^username'
+          line: dbload:x:1003:1003::/opt/usrename:/bin/bash
+    - name: Alterar apontamento home user2
+      lineinfile:
+          dest: /etc/passwd
+          regex: '^username'
+          line: npdba:x:1004:1004::/opt/username:/bin/bash
+    - name: Alterar apontamento home user3
+      lineinfile:
+          dest: /etc/passwd
+          regex: '^username'
+          line: dbexpert:x:1002:1002::/opt/username:/bin/bash
+# Line of new disks in fstab with especict security permissions
+    - name: Apontamento fstab data
+      lineinfile:
+          dest: /etc/fstab
+          line: "/dev/mapper/vg1-data /data xfs rw,nosuid,nodev,noexec 0 0"
+    - name: Apontamento fstab backup
+      lineinfile:
+          dest: /etc/fstab
+          line: "/dev/mapper/vg2-backup /backup xfs rw,nosuid,nodev,noexec 0 0"
+    - name: Formatar /data
+      shell: "mkfs.xfs /dev/vg1/data"
+    - name: Formatar /backup
+      shell: "mkfs.xfs /dev/vg2/backup"
+    - name: Desativar swap
+      lineinfile:
+          dest: /etc/fstab
+          regex: '^/dev/mapper/vg0-swap'
+          line: "#/dev/mapper/vg0-swap    swap           swap defaults 0 0"
+#Reboot Machine          
+    - name: Reiniciar VM
+      reboot:
+
+    
