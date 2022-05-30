@@ -6,4 +6,4 @@
       register: commandname
     - name: Show information
       debug:
-        msg: "{{guser.stdout}}"
+        msg: "{{commandname.stdout}}"
